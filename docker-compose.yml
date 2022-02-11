@@ -1,0 +1,46 @@
+services:
+    apache:
+      image: apache
+      build:
+        context: .
+        dockerfile: ./Dockerfile.apache
+      container_name: apache
+      restart: always
+      expose:
+        - 80
+        - 443
+      ports:
+        - 80:80
+        - 443:443
+      networks:
+        - network
+
+    php:
+      image: php
+      build:
+        context: .
+        dockerfile: ./Dockerfile.php
+      container_name: php
+      restart: always
+      depends_on:
+        - mysql
+      expose:
+        - 9000
+      networks:
+        - network
+
+    mysql:
+      image: mysql:5.7
+      container_name: mysql
+      command: --default-authentication-plugin=mysql_native_password
+      restart: always
+      environment:
+        - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+        - MYSQL_DATABASE=${DB_DATABASE}
+      expose:
+        - 3306
+      networks:
+        - network
+networks:
+  network:
+    name: network
